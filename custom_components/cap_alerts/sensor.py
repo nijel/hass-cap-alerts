@@ -56,6 +56,14 @@ class CAPAlertsSummarySensor(CoordinatorEntity[CAPAlertsCoordinator], SensorEnti
     """Sensor showing CAP alerts with meteoalarm compatibility."""
 
     _attr_has_entity_name = True
+    
+    # Priority order for awareness levels: red > orange > yellow > green
+    _LEVEL_PRIORITY = {
+        AWARENESS_LEVEL_RED: 4,
+        AWARENESS_LEVEL_ORANGE: 3,
+        AWARENESS_LEVEL_YELLOW: 2,
+        AWARENESS_LEVEL_GREEN: 1,
+    }
 
     def __init__(
         self,
@@ -72,20 +80,12 @@ class CAPAlertsSummarySensor(CoordinatorEntity[CAPAlertsCoordinator], SensorEnti
         if not self.coordinator.data:
             return AWARENESS_LEVEL_GREEN
         
-        # Priority order: red > orange > yellow > green
-        level_priority = {
-            AWARENESS_LEVEL_RED: 4,
-            AWARENESS_LEVEL_ORANGE: 3,
-            AWARENESS_LEVEL_YELLOW: 2,
-            AWARENESS_LEVEL_GREEN: 1,
-        }
-        
         highest_level = AWARENESS_LEVEL_GREEN
         highest_priority = 0
         
         for alert in self.coordinator.data:
             awareness = SEVERITY_TO_AWARENESS.get(alert.severity, AWARENESS_LEVEL_GREEN)
-            priority = level_priority.get(awareness, 0)
+            priority = self._LEVEL_PRIORITY.get(awareness, 0)
             if priority > highest_priority:
                 highest_priority = priority
                 highest_level = awareness
@@ -116,16 +116,10 @@ class CAPAlertsSummarySensor(CoordinatorEntity[CAPAlertsCoordinator], SensorEnti
         # Get the alert with the highest severity
         highest_alert = None
         highest_priority = 0
-        level_priority = {
-            AWARENESS_LEVEL_RED: 4,
-            AWARENESS_LEVEL_ORANGE: 3,
-            AWARENESS_LEVEL_YELLOW: 2,
-            AWARENESS_LEVEL_GREEN: 1,
-        }
         
         for alert in self.coordinator.data:
             awareness = SEVERITY_TO_AWARENESS.get(alert.severity, AWARENESS_LEVEL_GREEN)
-            priority = level_priority.get(awareness, 0)
+            priority = self._LEVEL_PRIORITY.get(awareness, 0)
             if priority > highest_priority:
                 highest_priority = priority
                 highest_alert = alert
