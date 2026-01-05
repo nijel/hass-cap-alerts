@@ -144,10 +144,15 @@ class CAPAlertsSummarySensor(CoordinatorEntity[CAPAlertsCoordinator], SensorEnti
 
     @property
     def native_value(self) -> str:
-        """Return the highest awareness level (meteoalarm compatible).
+        """Return the sensor state (meteoalarm compatible).
         
-        Returns 'off' when there are no alerts (green level) for compatibility
-        with MeteoalarmCard, otherwise returns the awareness level.
+        Returns:
+            'off' when there are no alerts (green level)
+            'yellow', 'orange', or 'red' when alerts are active
+            
+        This matches meteoalarm integration behavior where the state is 'off'
+        when no alerts are present, allowing MeteoalarmCard to properly detect
+        the alert status.
         """
         awareness_level = self._get_highest_awareness_level()
         # Return 'off' for green (no alerts) to match meteoalarm integration behavior
