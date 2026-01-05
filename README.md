@@ -52,20 +52,36 @@ You can add multiple instances of the integration to monitor different feeds or 
 
 ## Usage
 
-After configuration, the integration creates a sensor entity showing the count of active alerts:
+After configuration, the integration creates a sensor entity showing alert status with meteoalarm compatibility:
 
 - **Entity ID**: `sensor.cap_alerts_alert_count`
-- **State**: Number of active alerts
-- **Attributes**: Detailed information about each alert including:
-  - Headline
-  - Description
-  - Severity (Minor, Moderate, Severe, Extreme)
-  - Urgency (Immediate, Expected, Future)
-  - Certainty (Observed, Likely, Possible, Unlikely)
-  - Event type
-  - Affected areas
-  - Effective and expiration times
-  - Instructions
+- **State**: Awareness level (green, yellow, orange, red) - compatible with meteoalarm
+- **Attributes**: Detailed information including:
+  - **awareness_level**: Highest alert level (green/yellow/orange/red)
+  - **awareness_type**: Event type of the highest severity alert
+  - **alert_count**: Number of active alerts
+  - **alerts**: List of all active alerts with:
+    - Headline
+    - Description
+    - Severity (Minor, Moderate, Severe, Extreme)
+    - Urgency (Immediate, Expected, Future)
+    - Certainty (Observed, Likely, Possible, Unlikely)
+    - Event type
+    - Affected areas
+    - Effective and expiration times
+    - Instructions
+
+### Meteoalarm Compatibility
+
+The sensor provides meteoalarm-compatible attributes, making it easy to use with cards and automations designed for the built-in meteoalarm integration:
+
+- **Awareness Levels**:
+  - 🟢 Green: No alerts
+  - 🟡 Yellow: Minor severity alerts
+  - 🟠 Orange: Moderate/Severe alerts
+  - 🔴 Red: Extreme alerts
+
+The sensor icon automatically changes based on the current awareness level.
 
 ### Automation Example
 
@@ -73,8 +89,24 @@ After configuration, the integration creates a sensor entity showing the count o
 automation:
   - alias: "Notify on severe weather alert"
     trigger:
+      - platform: state
+        entity_id: sensor.cap_alerts_alert_count
+        to:
+          - orange
+          - red
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "⚠️ Weather Alert!"
+          message: >
+            {{ state_attr('sensor.cap_alerts_alert_count', 'awareness_type') }}
+            - Level: {{ states('sensor.cap_alerts_alert_count') }}
+            
+  - alias: "Notify on any new alert"
+    trigger:
       - platform: numeric_state
         entity_id: sensor.cap_alerts_alert_count
+        attribute: alert_count
         above: 0
     condition:
       - condition: template
@@ -91,24 +123,41 @@ automation:
 ### Lovelace Card Example
 
 ```yaml
-type: markdown
-content: >
-  {% set alerts = state_attr('sensor.cap_alerts_alert_count', 'alerts') %}
-  {% if alerts %}
-    {% for alert in alerts %}
-      **{{ alert.headline }}**
-      
-      *Severity: {{ alert.severity }}*
-      
-      {{ alert.description }}
-      
-      Areas: {{ alert.area }}
-      
-      ---
-    {% endfor %}
-  {% else %}
-    No active alerts
-  {% endif %}
+# Card with awareness level display
+type: conditional
+conditions:
+  - entity: sensor.cap_alerts_alert_count
+    state_not: "green"
+card:
+  type: markdown
+  content: >
+    ## Weather Alerts - {{ states('sensor.cap_alerts_alert_count') | upper }}
+    
+    **Type:** {{ state_attr('sensor.cap_alerts_alert_count', 'awareness_type') }}
+    
+    **Active Alerts:** {{ state_attr('sensor.cap_alerts_alert_count', 'alert_count') }}
+    
+    ---
+    
+    {% set alerts = state_attr('sensor.cap_alerts_alert_count', 'alerts') %}
+    {% if alerts %}
+      {% for alert in alerts %}
+        **{{ alert.headline }}**
+        
+        *Severity: {{ alert.severity }} | Level: {{ alert.awareness_level }}*
+        
+        {{ alert.description }}
+        
+        Areas: {{ alert.area }}
+        
+        ---
+      {% endfor %}
+    {% endif %}
+
+# Simple entity card showing current status
+type: entity
+entity: sensor.cap_alerts_alert_count
+name: Weather Alert Status
 ```
 
 ## CAP Alert Specification

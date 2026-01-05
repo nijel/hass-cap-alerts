@@ -20,16 +20,35 @@
 
 # After configuration, you'll get a sensor entity:
 # sensor.cap_alerts_alert_count
+# State: awareness level (green/yellow/orange/red) - meteoalarm compatible
+# Attributes: awareness_level, awareness_type, alert_count, alerts
 
 # Use in automations:
 automation:
-  - alias: "Severe Weather Alert Notification"
+  - alias: "Severe Weather Alert Notification (using awareness level)"
+    trigger:
+      - platform: state
+        entity_id: sensor.cap_alerts_alert_count
+        to:
+          - orange
+          - red
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "⚠️ Weather Alert!"
+          message: >
+            {{ state_attr('sensor.cap_alerts_alert_count', 'awareness_type') }}
+            Level: {{ states('sensor.cap_alerts_alert_count') | upper }}
+            Active alerts: {{ state_attr('sensor.cap_alerts_alert_count', 'alert_count') }}
+
+  - alias: "Severe Weather Alert Notification (using alert count)"
     trigger:
       - platform: state
         entity_id: sensor.cap_alerts_alert_count
     condition:
       - condition: numeric_state
         entity_id: sensor.cap_alerts_alert_count
+        attribute: alert_count
         above: 0
       - condition: template
         value_template: >
@@ -48,9 +67,9 @@ automation:
 
   - alias: "Clear Weather Alert"
     trigger:
-      - platform: numeric_state
+      - platform: state
         entity_id: sensor.cap_alerts_alert_count
-        below: 1
+        to: green
     action:
       - service: notify.mobile_app
         data:
