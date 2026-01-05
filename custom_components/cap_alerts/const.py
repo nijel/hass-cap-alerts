@@ -25,3 +25,27 @@ ATTR_SENDER = "sender"
 ATTR_INSTRUCTION = "instruction"
 ATTR_CATEGORY = "category"
 ATTR_RESPONSE_TYPE = "response_type"
+ATTR_AWARENESS_LEVEL = "awareness_level"
+ATTR_AWARENESS_TYPE = "awareness_type"
+
+# Awareness levels (compatible with meteoalarm)
+AWARENESS_LEVEL_GREEN = "green"
+AWARENESS_LEVEL_YELLOW = "yellow"
+AWARENESS_LEVEL_ORANGE = "orange"
+AWARENESS_LEVEL_RED = "red"
+
+# CAP Severity to awareness level mapping
+SEVERITY_TO_AWARENESS = {
+    "Minor": AWARENESS_LEVEL_YELLOW,
+    "Moderate": AWARENESS_LEVEL_ORANGE,
+    "Severe": AWARENESS_LEVEL_ORANGE,
+    "Extreme": AWARENESS_LEVEL_RED,
+}
+
+# Icons for awareness levels
+AWARENESS_ICONS = {
+    AWARENESS_LEVEL_GREEN: "mdi:check-circle",
+    AWARENESS_LEVEL_YELLOW: "mdi:alert",
+    AWARENESS_LEVEL_ORANGE: "mdi:alert-circle",
+    AWARENESS_LEVEL_RED: "mdi:alert-octagon",
+}
