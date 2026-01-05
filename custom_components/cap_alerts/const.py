@@ -5,6 +5,7 @@ DOMAIN = "cap_alerts"
 # Configuration
 CONF_FEED_URL = "feed_url"
 CONF_AREA_FILTER = "area_filter"
+CONF_LANGUAGE_FILTER = "language_filter"
 CONF_SCAN_INTERVAL = "scan_interval"
 
 # Defaults

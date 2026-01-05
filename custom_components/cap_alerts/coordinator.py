@@ -25,11 +25,13 @@ class CAPAlertsCoordinator(DataUpdateCoordinator[list[CAPAlert]]):
         hass: HomeAssistant,
         feed_url: str,
         area_filter: str | None = None,
+        language_filter: str | None = None,
         scan_interval: int = DEFAULT_SCAN_INTERVAL,
     ) -> None:
         """Initialize the coordinator."""
         self.feed_url = feed_url
         self.area_filter = area_filter
+        self.language_filter = language_filter
         
         super().__init__(
             hass,
@@ -68,6 +70,19 @@ class CAPAlertsCoordinator(DataUpdateCoordinator[list[CAPAlert]]):
                 len(filtered_alerts),
                 self.area_filter,
             )
-            return filtered_alerts
+            all_alerts = filtered_alerts
+        
+        # Filter by language if specified
+        if self.language_filter:
+            filtered_alerts = [
+                alert for alert in all_alerts if alert.matches_language(self.language_filter)
+            ]
+            _LOGGER.debug(
+                "Filtered %d alerts to %d matching language '%s'",
+                len(all_alerts),
+                len(filtered_alerts),
+                self.language_filter,
+            )
+            all_alerts = filtered_alerts
         
         return all_alerts

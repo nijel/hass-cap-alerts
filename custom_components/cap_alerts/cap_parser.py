@@ -134,6 +134,13 @@ class CAPAlert:
         return ""
 
     @property
+    def language(self) -> str:
+        """Return first language from info."""
+        if self.info:
+            return self.info[0].get("language", "")
+        return ""
+
+    @property
     def areas(self) -> list[str]:
         """Return list of area names from all info sections."""
         area_names = []
@@ -171,6 +178,26 @@ class CAPAlert:
         
         # Check geocode values
         return any(area_filter_lower in geocode.lower() for geocode in self.geocodes)
+
+    def matches_language(self, language_filter: str | None) -> bool:
+        """Check if alert matches language filter.
+        
+        Matches against language codes in all info sections.
+        Supports partial matching (e.g., 'cs' matches 'cs-CZ').
+        """
+        if not language_filter:
+            return True
+        language_filter_lower = language_filter.lower()
+        
+        # Check language in all info sections
+        for info_item in self.info:
+            info_language = info_item.get("language", "")
+            if info_language:
+                # Case-insensitive partial matching
+                if language_filter_lower in info_language.lower():
+                    return True
+        
+        return False
 
 
 def parse_cap_xml(xml_content: str) -> list[CAPAlert]:
