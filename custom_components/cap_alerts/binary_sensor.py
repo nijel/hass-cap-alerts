@@ -1,10 +1,13 @@
-"""Sensor platform for CAP Alerts integration."""
+"""Binary sensor platform for CAP Alerts integration."""
 from __future__ import annotations
 
 import logging
 from typing import Any
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
+    BinarySensorEntity,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -47,17 +50,18 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up CAP Alerts sensors from a config entry."""
+    """Set up CAP Alerts binary sensor from a config entry."""
     coordinator: CAPAlertsCoordinator = hass.data[DOMAIN][entry.entry_id]
 
-    # Create a summary sensor
-    async_add_entities([CAPAlertsSummarySensor(coordinator, entry)])
+    # Create a binary sensor
+    async_add_entities([CAPAlertsBinarySensor(coordinator, entry)])
 
 
-class CAPAlertsSummarySensor(CoordinatorEntity[CAPAlertsCoordinator], SensorEntity):
-    """Sensor showing CAP alerts with meteoalarm compatibility."""
+class CAPAlertsBinarySensor(CoordinatorEntity[CAPAlertsCoordinator], BinarySensorEntity):
+    """Binary sensor showing CAP alerts with meteoalarm compatibility."""
 
     _attr_has_entity_name = True
+    _attr_device_class = BinarySensorDeviceClass.SAFETY
     
     # Priority order for awareness levels: red > orange > yellow > green
     _LEVEL_PRIORITY = {
@@ -72,7 +76,7 @@ class CAPAlertsSummarySensor(CoordinatorEntity[CAPAlertsCoordinator], SensorEnti
         coordinator: CAPAlertsCoordinator,
         entry: ConfigEntry,
     ) -> None:
-        """Initialize the sensor."""
+        """Initialize the binary sensor."""
         super().__init__(coordinator)
         self._attr_unique_id = f"{entry.entry_id}_alert"
         self._attr_name = "Alert"
@@ -143,22 +147,10 @@ class CAPAlertsSummarySensor(CoordinatorEntity[CAPAlertsCoordinator], SensorEnti
             return "1; Wind"
 
     @property
-    def native_value(self) -> str:
-        """Return the sensor state (meteoalarm compatible).
-        
-        Returns:
-            'off' when there are no alerts (green level)
-            'yellow', 'orange', or 'red' when alerts are active
-            
-        This matches meteoalarm integration behavior where the state is 'off'
-        when no alerts are present, allowing MeteoalarmCard to properly detect
-        the alert status.
-        """
+    def is_on(self) -> bool:
+        """Return True if alerts are active."""
         awareness_level = self._get_highest_awareness_level()
-        # Return 'off' for green (no alerts) to match meteoalarm integration behavior
-        if awareness_level == AWARENESS_LEVEL_GREEN:
-            return "off"
-        return awareness_level
+        return awareness_level != AWARENESS_LEVEL_GREEN
 
     @property
     def icon(self) -> str:

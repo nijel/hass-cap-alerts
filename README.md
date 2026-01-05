@@ -52,10 +52,11 @@ You can add multiple instances of the integration to monitor different feeds or 
 
 ## Usage
 
-After configuration, the integration creates a sensor entity showing alert status with meteoalarm compatibility:
+After configuration, the integration creates a binary sensor entity showing alert status with meteoalarm compatibility:
 
-- **Entity ID**: `sensor.cap_alerts_alert`
-- **State**: `off` when no alerts, or awareness level (`yellow`, `orange`, `red`) when alerts are active - compatible with meteoalarm
+- **Entity ID**: `binary_sensor.cap_alerts_alert`
+- **State**: `on` when alerts are active, `off` when no alerts - follows meteoalarm integration pattern
+- **Device Class**: Safety
 - **Attributes**: Detailed information including:
   - **awareness_level**: Highest alert level in MeteoalarmCard format ("2; Yellow", "3; Orange", "4; Red")
   - **awareness_type**: Event type in MeteoalarmCard format ("1; Wind", "10; Rain", etc.)
@@ -73,9 +74,10 @@ After configuration, the integration creates a sensor entity showing alert statu
 
 ### Meteoalarm Compatibility
 
-The sensor provides meteoalarm-compatible attributes, making it easy to use with cards and automations designed for the built-in meteoalarm integration and custom cards like [MeteoalarmCard](https://github.com/MrBartusek/MeteoalarmCard):
+The binary sensor provides meteoalarm-compatible attributes, making it easy to use with cards and automations designed for the built-in meteoalarm integration and custom cards like [MeteoalarmCard](https://github.com/MrBartusek/MeteoalarmCard):
 
-- **Awareness Levels**:
+- **Binary Sensor State**: `on` when alerts are active, `off` when no alerts (matches meteoalarm integration)
+- **Awareness Levels** (in attributes):
   - 🟢 Green: No alerts
   - 🟡 Yellow: Minor severity alerts
   - 🟠 Orange: Moderate/Severe alerts
@@ -94,10 +96,10 @@ To use this integration with [MeteoalarmCard](https://github.com/MrBartusek/Mete
 ```yaml
 type: 'custom:meteoalarm-card'
 integration: 'meteoalarm'
-entities: 'sensor.cap_alerts_alert'
+entities: 'binary_sensor.cap_alerts_alert'
 ```
 
-The card will automatically detect and display your CAP alerts with the appropriate colors and icons.
+The binary sensor behaves exactly like Home Assistant's built-in meteoalarm integration, ensuring full compatibility with MeteoalarmCard.
 
 ### Automation Example
 
@@ -106,34 +108,33 @@ automation:
   - alias: "Notify on severe weather alert"
     trigger:
       - platform: state
-        entity_id: sensor.cap_alerts_alert
-        to:
-          - orange
-          - red
+        entity_id: binary_sensor.cap_alerts_alert
+        to: "on"
+    condition:
+      - condition: template
+        value_template: >
+          {% set level = state_attr('binary_sensor.cap_alerts_alert', 'awareness_level') %}
+          {{ level and (level.startswith('3;') or level.startswith('4;')) }}
     action:
       - service: notify.mobile_app
         data:
           title: "⚠️ Weather Alert!"
           message: >
-            {{ state_attr('sensor.cap_alerts_alert', 'awareness_type') }}
-            - Level: {{ states('sensor.cap_alerts_alert') }}
+            {{ state_attr('binary_sensor.cap_alerts_alert', 'awareness_type') }}
             
   - alias: "Notify on any new alert"
     trigger:
-      - platform: numeric_state
-        entity_id: sensor.cap_alerts_alert
-        attribute: alert_count
-        above: 0
-    condition:
-      - condition: template
-        value_template: >
-          {{ state_attr('sensor.cap_alerts_alert', 'alerts')[0].severity in ['Severe', 'Extreme'] }}
+      - platform: state
+        entity_id: binary_sensor.cap_alerts_alert
+        from: "off"
+        to: "on"
     action:
       - service: notify.mobile_app
         data:
           title: "Weather Alert!"
           message: >
-            {{ state_attr('sensor.cap_alerts_alert', 'alerts')[0].headline }}
+            {% set alerts = state_attr('binary_sensor.cap_alerts_alert', 'alerts') %}
+            {% if alerts %}{{ alerts[0].headline }}{% endif %}
 ```
 
 ### Lovelace Card Example
@@ -142,20 +143,20 @@ automation:
 # Card with awareness level display
 type: conditional
 conditions:
-  - entity: sensor.cap_alerts_alert
+  - entity: binary_sensor.cap_alerts_alert
     state_not: "off"
 card:
   type: markdown
   content: >
-    ## Weather Alerts - {{ states('sensor.cap_alerts_alert') | upper }}
+    ## Weather Alerts - {{ states('binary_sensor.cap_alerts_alert') | upper }}
     
-    **Type:** {{ state_attr('sensor.cap_alerts_alert', 'awareness_type') }}
+    **Type:** {{ state_attr('binary_sensor.cap_alerts_alert', 'awareness_type') }}
     
-    **Active Alerts:** {{ state_attr('sensor.cap_alerts_alert', 'alert_count') }}
+    **Active Alerts:** {{ state_attr('binary_sensor.cap_alerts_alert', 'alert_count') }}
     
     ---
     
-    {% set alerts = state_attr('sensor.cap_alerts_alert', 'alerts') %}
+    {% set alerts = state_attr('binary_sensor.cap_alerts_alert', 'alerts') %}
     {% if alerts %}
       {% for alert in alerts %}
         **{{ alert.headline }}**
@@ -172,7 +173,7 @@ card:
 
 # Simple entity card showing current status
 type: entity
-entity: sensor.cap_alerts_alert
+entity: binary_sensor.cap_alerts_alert
 name: Weather Alert Status
 ```
 
