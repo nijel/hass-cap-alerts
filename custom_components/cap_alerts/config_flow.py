@@ -49,14 +49,15 @@ class CAPAlertsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data=user_input,
             )
 
-        # Get the Home Assistant language to use as default suggestion
+        # Language filter defaults to empty (no filtering)
+        # but we provide HA language as a hint in the description
         ha_language = self.hass.config.language or "en"
         
         data_schema = vol.Schema(
             {
                 vol.Required(CONF_FEED_URL, default=DEFAULT_CHMI_URL): cv.string,
                 vol.Optional(CONF_AREA_FILTER): cv.string,
-                vol.Optional(CONF_LANGUAGE_FILTER, description={"suggested_value": ha_language}): cv.string,
+                vol.Optional(CONF_LANGUAGE_FILTER): cv.string,
                 vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): cv.positive_int,
             }
         )

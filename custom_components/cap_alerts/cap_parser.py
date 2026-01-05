@@ -183,7 +183,11 @@ class CAPAlert:
         """Check if alert matches language filter.
         
         Matches against language codes in all info sections.
-        Supports prefix matching (e.g., 'cs' matches 'cs-CZ' but not 'denver').
+        Uses exact match or prefix matching where info language starts with filter.
+        Examples: 
+        - 'cs' matches 'cs' or 'cs-CZ' 
+        - 'cs-CZ' matches only 'cs-CZ' (not 'cs')
+        - 'en' does not match 'french' (no false positives)
         """
         if not language_filter:
             return True

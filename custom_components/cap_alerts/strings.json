@@ -7,7 +7,7 @@
         "data": {
           "feed_url": "CAP Feed URL",
           "area_filter": "Area Filter (optional)",
-          "language_filter": "Language Filter (optional)",
+          "language_filter": "Language Filter (optional, e.g., 'en', 'cs', or 'cs-CZ')",
           "scan_interval": "Update Interval (seconds)"
         }
       }
