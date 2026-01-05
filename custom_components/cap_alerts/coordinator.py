@@ -31,7 +31,7 @@ class CAPAlertsCoordinator(DataUpdateCoordinator[list[CAPAlert]]):
         self.feed_url = feed_url
         self.area_filter = area_filter
         self.language_filter = language_filter
-        
+
         super().__init__(
             hass,
             _LOGGER,
@@ -70,11 +70,13 @@ class CAPAlertsCoordinator(DataUpdateCoordinator[list[CAPAlert]]):
                 self.area_filter,
             )
             all_alerts = filtered_alerts
-        
+
         # Filter by language if specified
         if self.language_filter:
             filtered_alerts = [
-                alert for alert in all_alerts if alert.matches_language(self.language_filter)
+                alert
+                for alert in all_alerts
+                if alert.matches_language(self.language_filter)
             ]
             _LOGGER.debug(
                 "Filtered %d alerts to %d matching language '%s'",
@@ -83,5 +85,5 @@ class CAPAlertsCoordinator(DataUpdateCoordinator[list[CAPAlert]]):
                 self.language_filter,
             )
             all_alerts = filtered_alerts
-        
+
         return all_alerts

@@ -8,7 +8,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
-from .const import CONF_AREA_FILTER, CONF_FEED_URL, CONF_LANGUAGE_FILTER, CONF_SCAN_INTERVAL, DOMAIN
+from .const import (
+    CONF_AREA_FILTER,
+    CONF_FEED_URL,
+    CONF_LANGUAGE_FILTER,
+    CONF_SCAN_INTERVAL,
+    DOMAIN,
+)
 from .coordinator import CAPAlertsCoordinator
 
 _LOGGER = logging.getLogger(__name__)

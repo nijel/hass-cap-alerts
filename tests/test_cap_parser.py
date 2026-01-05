@@ -342,7 +342,7 @@ def test_language_property():
     """Test accessing language property from alert."""
     alerts = parse_cap_xml(SAMPLE_CAP_XML)
     alert = alerts[0]
-    
+
     # Should return first info section's language
     assert alert.language == "en-US"
 
@@ -367,10 +367,10 @@ def test_language_filter_match():
         </info>
     </alert>
     """
-    
+
     alerts = parse_cap_xml(language_xml)
     alert = alerts[0]
-    
+
     assert alert.matches_language("cs") is True
     assert alert.matches_language("CS") is True  # Case insensitive
     assert alert.matches_language(None) is True  # No filter matches all
@@ -396,15 +396,15 @@ def test_language_filter_partial_match():
         </info>
     </alert>
     """
-    
+
     alerts = parse_cap_xml(language_xml)
     alert = alerts[0]
-    
+
     # Prefix match: 'cs' should match 'cs-CZ'
     assert alert.matches_language("cs") is True
     assert alert.matches_language("cs-CZ") is True
     assert alert.matches_language("CS-CZ") is True  # Case insensitive
-    
+
     # Partial match on region code should NOT match (not a prefix)
     assert alert.matches_language("CZ") is False
 
@@ -429,10 +429,10 @@ def test_language_filter_no_match():
         </info>
     </alert>
     """
-    
+
     alerts = parse_cap_xml(language_xml)
     alert = alerts[0]
-    
+
     # Should not match different language codes
     assert alert.matches_language("en") is False
     assert alert.matches_language("de") is False
@@ -460,16 +460,16 @@ def test_language_filter_no_false_positives():
         </info>
     </alert>
     """
-    
+
     alerts = parse_cap_xml(en_xml)
     alert = alerts[0]
-    
+
     # 'en' should NOT match languages that just contain 'en' as substring
     # These would be false positives with naive substring matching
     assert alert.matches_language("french") is False
     assert alert.matches_language("denver") is False
     assert alert.matches_language("sven") is False
-    
+
     # Only valid prefix/exact matches should work
     assert alert.matches_language("en") is True
     assert alert.matches_language("EN") is True
@@ -503,15 +503,15 @@ def test_language_filter_multiple_info_sections():
         </info>
     </alert>
     """
-    
+
     alerts = parse_cap_xml(multi_lang_xml)
     alert = alerts[0]
-    
+
     # Should match if any info section has the language
     assert alert.matches_language("en") is True
     assert alert.matches_language("cs") is True
     assert alert.matches_language("en-US") is True
-    
+
     # Should not match language not in any section
     assert alert.matches_language("de") is False
 
@@ -535,17 +535,16 @@ def test_language_filter_no_language():
         </info>
     </alert>
     """
-    
+
     alerts = parse_cap_xml(no_lang_xml)
     alert = alerts[0]
-    
+
     # Alert without language should not match any specific language filter
     assert alert.matches_language("en") is False
     assert alert.matches_language("cs") is False
-    
+
     # But should match when no filter is provided
     assert alert.matches_language(None) is True
-    
+
     # Language property should return empty string
     assert alert.language == ""
-

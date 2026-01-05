@@ -53,7 +53,9 @@ class CAPAlertsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_FEED_URL, default=DEFAULT_CHMI_URL): cv.string,
                 vol.Optional(CONF_AREA_FILTER): cv.string,
                 vol.Optional(CONF_LANGUAGE_FILTER): cv.string,
-                vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): cv.positive_int,
+                vol.Optional(
+                    CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
+                ): cv.positive_int,
             }
         )
 
