@@ -1,12 +1,12 @@
 """Data update coordinator for CAP alerts."""
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import timedelta
 from typing import Any
 
 import aiohttp
-import async_timeout
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -41,7 +41,7 @@ class CAPAlertsCoordinator(DataUpdateCoordinator[list[CAPAlert]]):
     async def _async_update_data(self) -> list[CAPAlert]:
         """Fetch data from CAP feed."""
         try:
-            async with async_timeout.timeout(30):
+            async with asyncio.timeout(30):
                 async with aiohttp.ClientSession() as session:
                     async with session.get(self.feed_url) as response:
                         if response.status != 200:
