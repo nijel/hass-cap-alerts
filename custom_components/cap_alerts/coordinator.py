@@ -1,18 +1,17 @@
 """Data update coordinator for CAP alerts."""
+
 from __future__ import annotations
 
 import asyncio
 import logging
 from datetime import timedelta
-from typing import Any
 
 import aiohttp
-
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .cap_parser import CAPAlert, parse_cap_xml
-from .const import CONF_AREA_FILTER, CONF_FEED_URL, DEFAULT_SCAN_INTERVAL
+from .const import DEFAULT_SCAN_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -58,7 +57,7 @@ class CAPAlertsCoordinator(DataUpdateCoordinator[list[CAPAlert]]):
 
         # Parse the CAP XML
         all_alerts = parse_cap_xml(xml_content)
-        
+
         # Filter by area if specified
         if self.area_filter:
             filtered_alerts = [
