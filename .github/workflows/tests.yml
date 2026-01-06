@@ -1,0 +1,31 @@
+name: Tests
+
+permissions:
+  contents: read
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run tests
+
+    steps:
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+    - name: Setup Python
+      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
+      with:
+        python-version: '3.12'
+
+    - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7
+
+    - name: Install dependencies
+      run: |
+        uv pip install --system pytest homeassistant
+
+    - name: Run tests
+      run: |
+        python -m pytest tests/ -v --ignore=tests/test_parser_standalone.py
