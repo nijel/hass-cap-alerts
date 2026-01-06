@@ -13,6 +13,7 @@ from homeassistant.data_entry_flow import FlowResult
 from .const import (
     CONF_AREA_FILTER,
     CONF_FEED_URL,
+    CONF_LANGUAGE_FILTER,
     CONF_SCAN_INTERVAL,
     DEFAULT_CHMI_URL,
     DEFAULT_SCAN_INTERVAL,
@@ -20,16 +21,6 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-STEP_USER_DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_FEED_URL, default=DEFAULT_CHMI_URL): cv.string,
-        vol.Optional(CONF_AREA_FILTER): cv.string,
-        vol.Optional(
-            CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
-        ): cv.positive_int,
-    }
-)
 
 
 class CAPAlertsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -57,8 +48,19 @@ class CAPAlertsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data=user_input,
             )
 
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_FEED_URL, default=DEFAULT_CHMI_URL): cv.string,
+                vol.Optional(CONF_AREA_FILTER): cv.string,
+                vol.Optional(CONF_LANGUAGE_FILTER): cv.string,
+                vol.Optional(
+                    CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
+                ): cv.positive_int,
+            }
+        )
+
         return self.async_show_form(
             step_id="user",
-            data_schema=STEP_USER_DATA_SCHEMA,
+            data_schema=data_schema,
             errors=errors,
         )

@@ -8,7 +8,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
-from .const import CONF_AREA_FILTER, CONF_FEED_URL, CONF_SCAN_INTERVAL, DOMAIN
+from .const import (
+    CONF_AREA_FILTER,
+    CONF_FEED_URL,
+    CONF_LANGUAGE_FILTER,
+    CONF_SCAN_INTERVAL,
+    DOMAIN,
+)
 from .coordinator import CAPAlertsCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -20,12 +26,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up CAP Alerts from a config entry."""
     feed_url = entry.data[CONF_FEED_URL]
     area_filter = entry.data.get(CONF_AREA_FILTER)
+    language_filter = entry.data.get(CONF_LANGUAGE_FILTER)
     scan_interval = entry.data.get(CONF_SCAN_INTERVAL)
 
     coordinator = CAPAlertsCoordinator(
         hass,
         feed_url=feed_url,
         area_filter=area_filter,
+        language_filter=language_filter,
         scan_interval=scan_interval,
     )
 
