@@ -104,4 +104,3 @@ entities:
 type: custom:meteoalarm-card
 integration: weatheralerts
 entities: sensor.cap_alerts_alert
-
