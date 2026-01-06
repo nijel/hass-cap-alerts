@@ -10,7 +10,7 @@
           "scan_interval": "Interval aktualizace (sekundy)"
         },
         "data_description": {
-          "area_filter": "Filtrování výstrah podle názvu oblasti nebo geokódu. Filtruje proti tagům areaDesc a geocode. Ponechte prázdné pro příjem všech výstrah.",
+          "area_filter": "Filtrování výstrah podle názvu oblasti nebo geokódu (např. kód CISORP). Filtruje proti tagům areaDesc a geocode. Ponechte prázdné pro příjem všech výstrah. Kódy CISORP viz https://apl2.czso.cz/iSMS/cisdet.jsp?kodcis=65.",
           "language_filter": "Filtrování výstrah podle kódu jazyka (např. 'en', 'cs', 'cs-CZ'). Ponechte prázdné pro příjem výstrah ve všech jazycích.",
           "scan_interval": "Jak často kontrolovat nové výstrahy, v sekundách"
         }

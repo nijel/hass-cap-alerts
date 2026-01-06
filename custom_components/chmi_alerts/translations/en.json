@@ -10,7 +10,7 @@
           "scan_interval": "Update Interval (seconds)"
         },
         "data_description": {
-          "area_filter": "Filter alerts by area name or geocode. Matches against areaDesc and geocode tags. Leave empty to receive all alerts.",
+          "area_filter": "Filter alerts by area name or geocode (e.g., CISORP code). Matches against areaDesc and geocode tags. Leave empty to receive all alerts. See https://apl2.czso.cz/iSMS/cisdet.jsp?kodcis=65 for CISORP codes.",
           "language_filter": "Filter alerts by language code (e.g., 'en', 'cs', 'cs-CZ'). Leave empty to receive alerts in all languages.",
           "scan_interval": "How often to check for new alerts, in seconds"
         }

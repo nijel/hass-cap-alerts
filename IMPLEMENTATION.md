@@ -117,6 +117,8 @@ Set up multiple instances to monitor different regions:
 
 Use CISORP or EMMA_ID codes to filter alerts for specific administrative regions.
 
+To find CISORP codes for Czech locations, see: https://apl2.czso.cz/iSMS/cisdet.jsp?kodcis=65
+
 ## Integration with Home Assistant
 
 ### Automations
