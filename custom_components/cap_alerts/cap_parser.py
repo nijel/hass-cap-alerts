@@ -65,12 +65,36 @@ class CAPAlert:
         """
         self._language_filter = language_filter
 
+    def _info_matches_language(self, info_language: str, language_filter: str) -> bool:
+        """Check if an info section's language matches the language filter.
+
+        Args:
+            info_language: Language code from info section (e.g., 'cs', 'en-GB')
+            language_filter: Language filter to match against (e.g., 'cs', 'en')
+
+        Returns:
+            True if languages match (exact or prefix match), False otherwise
+
+        """
+        if not info_language or not language_filter:
+            return False
+
+        info_language_lower = info_language.lower()
+        language_filter_lower = language_filter.lower()
+
+        # Exact match or prefix match with hyphen separator
+        return (
+            info_language_lower == language_filter_lower
+            or info_language_lower.startswith(language_filter_lower + "-")
+        )
+
     def _get_preferred_info(self) -> dict[str, Any] | None:
         """Get the preferred info section based on language filter and severity.
 
         Returns:
-            - If language filter is set: the info with highest severity that matches the language
-            - Otherwise: the first info section
+            - If language filter is set and matches: the matching info with highest severity
+            - If language filter is set but no matches: falls back to first info section
+            - If no language filter: the first info section
 
         """
         if not self.info:
@@ -82,18 +106,13 @@ class CAPAlert:
 
         # Find all info sections matching the language filter
         matching_infos = []
-        language_filter_lower = self._language_filter.lower()
 
         for info_item in self.info:
             info_language = info_item.get("language", "")
-            if info_language:
-                info_language_lower = info_language.lower()
-                # Exact match or prefix match with hyphen separator
-                if (
-                    info_language_lower == language_filter_lower
-                    or info_language_lower.startswith(language_filter_lower + "-")
-                ):
-                    matching_infos.append(info_item)
+            if info_language and self._info_matches_language(
+                info_language, self._language_filter
+            ):
+                matching_infos.append(info_item)
 
         # If no matching info found, return first (backward compatibility)
         if not matching_infos:
@@ -263,7 +282,13 @@ class CAPAlert:
 
     @property
     def areas(self) -> list[str]:
-        """Return list of area names from all info sections."""
+        """Return list of area names from all info sections.
+
+        Note: This property aggregates areas from ALL info sections, not just the
+        preferred one. This is intentional because different info sections (e.g.,
+        different languages) may have different area coverage, and we want to show
+        all affected areas for filtering purposes.
+        """
         area_names = []
         for info_item in self.info:
             for area in info_item.get("areas", []):
@@ -274,7 +299,13 @@ class CAPAlert:
 
     @property
     def geocodes(self) -> list[str]:
-        """Return list of all geocode values from all info sections."""
+        """Return list of all geocode values from all info sections.
+
+        Note: This property aggregates geocodes from ALL info sections, not just the
+        preferred one. This is intentional because different info sections (e.g.,
+        different languages) may have different area coverage, and we want to show
+        all affected geocodes for filtering purposes.
+        """
         geocode_values = set()
         for info_item in self.info:
             for area in info_item.get("areas", []):
@@ -314,19 +345,12 @@ class CAPAlert:
         """
         if not language_filter:
             return True
-        language_filter_lower = language_filter.lower()
 
-        # Check language in all info sections
+        # Check language in all info sections using the helper method
         for info_item in self.info:
             info_language = info_item.get("language", "")
-            if info_language:
-                info_language_lower = info_language.lower()
-                # Exact match or prefix match with hyphen separator
-                if (
-                    info_language_lower == language_filter_lower
-                    or info_language_lower.startswith(language_filter_lower + "-")
-                ):
-                    return True
+            if self._info_matches_language(info_language, language_filter):
+                return True
 
         return False
 
