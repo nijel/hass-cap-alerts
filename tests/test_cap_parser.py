@@ -548,3 +548,95 @@ def test_language_filter_no_language():
 
     # Language property should return empty string
     assert alert.language == ""
+
+
+def test_multiple_geocodes_same_valuename():
+    """Test parsing multiple geocodes with same valueName (e.g., multiple CISORP codes).
+
+    This is a regression test for the issue where only the last geocode value
+    for each valueName was kept, causing filtering to fail.
+    """
+    multi_geocode_xml = """<?xml version="1.0" encoding="UTF-8"?>
+    <alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+        <identifier>TEST-MULTI-GEOCODE-001</identifier>
+        <sender>test@example.com</sender>
+        <sent>2026-01-05T10:00:00+00:00</sent>
+        <status>Actual</status>
+        <msgType>Alert</msgType>
+        <scope>Public</scope>
+        <info>
+            <language>cs</language>
+            <headline>Test Alert with Multiple Geocodes</headline>
+            <severity>Minor</severity>
+            <area>
+                <areaDesc>Královéhradecký kraj (Hořice, Hradec Králové, Jičín, Nový Bydžov)</areaDesc>
+                <geocode>
+                    <valueName>CISORP</valueName>
+                    <value>5204</value>
+                </geocode>
+                <geocode>
+                    <valueName>EMMA_ID</valueName>
+                    <value>CZ05204</value>
+                </geocode>
+                <geocode>
+                    <valueName>CISORP</valueName>
+                    <value>5205</value>
+                </geocode>
+                <geocode>
+                    <valueName>EMMA_ID</valueName>
+                    <value>CZ05205</value>
+                </geocode>
+                <geocode>
+                    <valueName>CISORP</valueName>
+                    <value>5207</value>
+                </geocode>
+                <geocode>
+                    <valueName>EMMA_ID</valueName>
+                    <value>CZ05207</value>
+                </geocode>
+                <geocode>
+                    <valueName>CISORP</valueName>
+                    <value>5212</value>
+                </geocode>
+                <geocode>
+                    <valueName>EMMA_ID</valueName>
+                    <value>CZ05212</value>
+                </geocode>
+            </area>
+        </info>
+    </alert>
+    """
+
+    alerts = parse_cap_xml(multi_geocode_xml)
+    assert len(alerts) == 1
+    alert = alerts[0]
+
+    # Check that ALL geocodes are collected, not just the last ones
+    geocodes = alert.geocodes
+    assert len(geocodes) == 8
+
+    # All CISORP values should be present
+    assert "5204" in geocodes
+    assert "5205" in geocodes
+    assert "5207" in geocodes
+    assert "5212" in geocodes
+
+    # All EMMA_ID values should be present
+    assert "CZ05204" in geocodes
+    assert "CZ05205" in geocodes
+    assert "CZ05207" in geocodes
+    assert "CZ05212" in geocodes
+
+    # Test filtering matches any of the geocodes
+    assert alert.matches_area("5204") is True
+    assert alert.matches_area("5205") is True
+    assert alert.matches_area("5207") is True
+    assert alert.matches_area("5212") is True
+    assert alert.matches_area("CZ05204") is True
+    assert alert.matches_area("CZ05205") is True
+    assert alert.matches_area("CZ05207") is True
+    assert alert.matches_area("CZ05212") is True
+
+    # Test that non-existent codes don't match
+    assert alert.matches_area("5106") is False
+    assert alert.matches_area("CZ05106") is False
