@@ -60,7 +60,7 @@ async def async_setup_entry(
 class CAPAlertsBinarySensor(
     CoordinatorEntity[CAPAlertsCoordinator], BinarySensorEntity
 ):
-    """Binary sensor showing CAP alerts with meteoalarm compatibility."""
+    """Binary sensor showing CHMI alerts with meteoalarm compatibility."""
 
     _attr_has_entity_name = True
     _attr_device_class = BinarySensorDeviceClass.SAFETY
