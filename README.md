@@ -162,18 +162,18 @@ card:
   type: markdown
   content: >
     ## Weather Alerts Active
-    
+
     {% set alerts = state_attr('binary_sensor.cap_alerts_alert', 'alerts') %}
     {% if alerts %}
       {% for alert in alerts %}
         **{{ alert.headline }}**
-        
+
         *Severity: {{ alert.severity }}*
-        
+
         {{ alert.description }}
-        
+
         Areas: {{ alert.area }}
-        
+
         ---
       {% endfor %}
     {% endif %}
