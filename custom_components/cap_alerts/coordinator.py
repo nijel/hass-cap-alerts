@@ -85,5 +85,9 @@ class CAPAlertsCoordinator(DataUpdateCoordinator[list[CAPAlert]]):
                 self.language_filter,
             )
             all_alerts = filtered_alerts
+            
+            # Set language filter on each alert so it returns the preferred info section
+            for alert in all_alerts:
+                alert.set_language_filter(self.language_filter)
 
         return all_alerts
