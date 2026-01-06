@@ -44,6 +44,7 @@ The area filter supports multiple matching modes:
 
 - **Area names**: Filter by area description (e.g., "Prague", "Středočeský kraj")
 - **Geocode values**: Filter by CISORP codes (e.g., "2102"), EMMA_ID codes (e.g., "CZ02102"), or any other geocode value
+  - To find CISORP codes for locations, see: https://apl2.czso.cz/iSMS/cisdet.jsp?kodcis=65
 - **Partial matching**: Case-insensitive substring matching (e.g., "Bohemia" matches "Central Bohemia")
 
 ### Example Configurations
