@@ -158,8 +158,8 @@ class CAPAlert:
         geocode_values = set()
         for info_item in self.info:
             for area in info_item.get("areas", []):
-                geocode_dict = area.get("geocode", {})
-                for value in geocode_dict.values():
+                geocode_list = area.get("geocode", [])
+                for value in geocode_list:
                     if value:
                         geocode_values.add(value)
         return list(geocode_values)
@@ -310,17 +310,17 @@ def _parse_info_element(info_elem: ET.Element, ns: str) -> dict[str, Any]:
         if area_desc is not None and area_desc.text:
             area_data["areaDesc"] = area_desc.text.strip()
 
-        # Parse geocodes
-        geocodes = {}
+        # Parse geocodes - collect all values (not as dict to avoid overwriting duplicates)
+        geocode_values = []
         for geocode in area_elem.findall(f"{ns}geocode"):
             value_name = geocode.find(f"{ns}valueName")
             value = geocode.find(f"{ns}value")
             if value_name is not None and value is not None:
                 if value_name.text and value.text:
-                    geocodes[value_name.text.strip()] = value.text.strip()
+                    geocode_values.append(value.text.strip())
 
-        if geocodes:
-            area_data["geocode"] = geocodes
+        if geocode_values:
+            area_data["geocode"] = geocode_values
 
         # Parse polygons and circles if present
         polygon = area_elem.find(f"{ns}polygon")
