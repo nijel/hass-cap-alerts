@@ -1,4 +1,4 @@
-"""Data update coordinator for CAP alerts."""
+"""Data update coordinator for CHMI alerts."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class CAPAlertsCoordinator(DataUpdateCoordinator[list[CAPAlert]]):
-    """Class to manage fetching CAP alerts data."""
+    """Class to manage fetching CHMI alerts data."""
 
     def __init__(
         self,
@@ -35,7 +35,7 @@ class CAPAlertsCoordinator(DataUpdateCoordinator[list[CAPAlert]]):
         super().__init__(
             hass,
             _LOGGER,
-            name="CAP Alerts",
+            name="CHMI Alerts",
             update_interval=timedelta(seconds=scan_interval),
         )
 

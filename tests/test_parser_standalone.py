@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standalone test for CAP parser without requiring Home Assistant."""
+"""Standalone test for CHMI alerts parser without requiring Home Assistant."""
 
 import sys
 from pathlib import Path
@@ -12,7 +12,10 @@ import importlib.util
 
 spec = importlib.util.spec_from_file_location(
     "cap_parser",
-    Path(__file__).parent.parent / "custom_components" / "cap_alerts" / "cap_parser.py",
+    Path(__file__).parent.parent
+    / "custom_components"
+    / "chmi_alerts"
+    / "cap_parser.py",
 )
 parser = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(parser)
