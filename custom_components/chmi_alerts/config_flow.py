@@ -55,7 +55,7 @@ class CHMIAlertsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         data_schema = vol.Schema(
             {
-                vol.Optional(CONF_AREA_FILTER): selector.SelectSelector(
+                vol.Optional(CONF_AREA_FILTER, default=""): selector.SelectSelector(
                     selector.SelectSelectorConfig(
                         options=location_options,
                         mode=selector.SelectSelectorMode.DROPDOWN,
