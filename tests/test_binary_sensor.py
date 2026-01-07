@@ -69,7 +69,7 @@ async def test_entity_name_without_area(mock_coordinator, mock_entry_without_are
 
     # When no area is specified, name should be None and translation_key should be set
     assert sensor.name is None
-    assert sensor._attr_translation_key == "alert"
+    assert sensor._attr_translation_key == "alert"  # noqa: SLF001
     assert sensor.unique_id == "test_entry_id_chmi_alerts"
 
 
