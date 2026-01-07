@@ -12,7 +12,6 @@ from homeassistant.helpers import selector
 
 from .const import (
     CISORP_CODE_TO_NAME,
-    CISORP_LOCATIONS,
     CONF_AREA_FILTER,
     CONF_LANGUAGE_FILTER,
     DOMAIN,
@@ -59,7 +58,7 @@ class CHMIAlertsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         location_options = [
             selector.SelectOptionDict(value="", label="All locations (no filter)")
         ]
-        for code, name in CISORP_LOCATIONS:
+        for code, name in CISORP_CODE_TO_NAME.items():
             location_options.append(
                 selector.SelectOptionDict(value=code, label=f"{name} ({code})")
             )
