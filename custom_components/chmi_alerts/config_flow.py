@@ -9,6 +9,7 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers import selector
 
 from .const import (
     CONF_AREA_FILTER,
@@ -43,10 +44,26 @@ class CHMIAlertsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data=user_input,
             )
 
+        # Pre-select language based on Home Assistant configuration
+        # Default to Czech if Home Assistant is using Czech language, English otherwise
+        default_language = "en"
+        if self.hass.config.language == "cs":
+            default_language = "cs"
+
         data_schema = vol.Schema(
             {
                 vol.Optional(CONF_AREA_FILTER): cv.string,
-                vol.Optional(CONF_LANGUAGE_FILTER): cv.string,
+                vol.Optional(
+                    CONF_LANGUAGE_FILTER, default=default_language
+                ): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=[
+                            selector.SelectOptionDict(value="cs", label="Czech"),
+                            selector.SelectOptionDict(value="en", label="English"),
+                        ],
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
+                ),
             }
         )
 
