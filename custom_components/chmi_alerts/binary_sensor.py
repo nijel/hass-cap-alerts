@@ -39,6 +39,7 @@ from .const import (
     CISORP_CODE_TO_NAME,
     CONF_AREA_FILTER,
     DOMAIN,
+    ENTITY_NAME_TRANSLATIONS,
     EVENT_TYPE_METEOALARM,
     SEVERITY_TO_AWARENESS,
 )
@@ -89,7 +90,7 @@ class CAPAlertsBinarySensor(
 
         # Build unique_id - use area code if available for uniqueness
         if area_code:
-            self._attr_unique_id = f"{entry.entry_id}_chmi_alerts_{area_code.lower()}"
+            self._attr_unique_id = f"{entry.entry_id}_chmi_alerts_{area_code}"
         else:
             self._attr_unique_id = f"{entry.entry_id}_chmi_alerts"
 
@@ -111,14 +112,8 @@ class CAPAlertsBinarySensor(
         if self._area_name:
             # Build localized name with area
             # Get the translated base word for "Alerts"
-            # Use the hass language to determine which translation to use
             language = self._hass.config.language if self._hass else "en"
-
-            # Map language codes to translated "Alerts" word
-            if language == "cs":
-                base_name = "Výstrahy"
-            else:
-                base_name = "Alerts"
+            base_name = ENTITY_NAME_TRANSLATIONS.get(language, "Alerts")
 
             return f"{base_name} {self._area_name}"
 
