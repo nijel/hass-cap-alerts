@@ -1,6 +1,5 @@
 name: Bug Report
 description: Report a problem with the CHMI Alerts integration
-title: '[Bug]: '
 labels: [bug]
 body:
 - type: markdown
@@ -15,7 +14,7 @@ body:
     description: What version of Home Assistant are you running?
     placeholder: e.g., 2024.1.0
   validations:
-    required: true
+    required: false
 
 - type: input
   id: integration-version
@@ -24,31 +23,7 @@ body:
     description: What version of the CHMI Alerts integration are you using?
     placeholder: e.g., 0.1.0
   validations:
-    required: true
-
-- type: dropdown
-  id: installation-method
-  attributes:
-    label: Installation Method
-    description: How did you install the integration?
-    options:
-    - HACS
-    - Manual
-  validations:
-    required: true
-
-- type: textarea
-  id: configuration
-  attributes:
-    label: Configuration
-    description: |
-      Please provide your configuration details for the CHMI Alerts integration.
-      You can find these in Settings → Devices & Services → CHMI Alerts → Configure.
-    placeholder: |
-      Area Filter: Prague
-      Update Interval: 300 seconds
-  validations:
-    required: true
+    required: false
 
 - type: textarea
   id: cap-xml
@@ -69,20 +44,11 @@ body:
     required: false
 
 - type: textarea
-  id: expected-behavior
+  id: description
   attributes:
-    label: Expected Behavior
-    description: What did you expect to happen?
-    placeholder: The integration should...
-  validations:
-    required: true
-
-- type: textarea
-  id: actual-behavior
-  attributes:
-    label: Actual Behavior
-    description: What actually happened?
-    placeholder: Instead, the integration...
+    label: Description
+    description: Describe the bug you're experiencing
+    placeholder: What happened and what did you expect to happen?
   validations:
     required: true
 
@@ -126,7 +92,3 @@ body:
     options:
     - label: I have searched existing issues to ensure this is not a duplicate
       required: true
-    - label: I have provided all the requested information above
-      required: true
-    - label: I am running the latest version of the integration
-      required: false
